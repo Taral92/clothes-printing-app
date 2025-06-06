@@ -1,31 +1,37 @@
-# Node.js
+# Node modules
 node_modules/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# dotenv environment files
 .env
+.env.*.local
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Build
 dist/
 build/
 
-# Logs
-*.log
-
-# NPM
-package-lock.json
-
-# Server
-server/node_modules/
-server/package-lock.json
-server/.env
-
-# Client
-client/node_modules/
-client/package-lock.json
-client/.env
-
-# OS
-.DS_Store
-
 # Vite
-.vite
+.vite/
 
-# Editor
+# IDE folders
 .vscode/
-*.swp
+.idea/
+
+# Misc
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal

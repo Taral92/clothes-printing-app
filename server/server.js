@@ -9,8 +9,14 @@ const paymentRoutes = require("./routes/paymentRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const cookieParser = require("cookie-parser");
 connectDB();
+const cors = require("cors");
+
 
 const app = express();
+app.use(cors({
+    credentials:true,
+    origin:"http://localhost:5173"
+}));
 app.use(express.json());
 app.use(cookieParser());
 

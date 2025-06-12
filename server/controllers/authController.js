@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 
 const secretKey = process.env.JWT_SECRET;
 const cookie=require("cookie");
-
+    
 
 const register = async (req, res) => {
     const { name, email, password } = req.body;
@@ -26,7 +26,7 @@ const register = async (req, res) => {
             sameSite: "strict",
             maxAge: 60 * 60 * 1000,
         });
-        res.status(201).json({ message: "User registered successfully" });
+        res.status(201).json({ message: `${name} registered successfully`,user :user.name });
     } catch (error) {
         res.status(500).json({ message: "Failed to register user" });
     }
@@ -47,12 +47,12 @@ const login = async (req, res) => {
     }
     const token = jwt.sign({ id: user._id }, secretKey, { expiresIn: "1h" });
     res.cookie("token", token, {
-        httpOnly: true,
+       httpOnly: true,
         secure: true,
         sameSite: "strict",
         maxAge: 60 * 60 * 1000,
     });
-    res.status(200).json({ message: "User logged in successfully" });
+    res.status(200).json({ message: "User logged in successfully",user :user.name });
 };
 
 module.exports = { register, login };

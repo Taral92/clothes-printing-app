@@ -2,29 +2,34 @@ const Product = require("../models/Product");
 const cloudinary = require("cloudinary");
 
 cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
 const createProduct = async (req, res) => {
   try {
-    const { name, description, type, sizes, basePrice, image } = req.body;
+    const { name, description, type, sizes, colors, basePrice, images } =
+      req.body;
 
-    if (!image) {
-      return res.status(400).json({ error: "Image is required" });
+    if (!images || !Array.isArray(images) || images.length === 0) {
+      return res.status(400).json({ error: "At least one image is required." });
     }
-    const result = await cloudinary.uploader.upload(image, {
-      folder: "clothes_products",
-    });
+
+    const uploadPromises = images.map((img) =>
+      cloudinary.uploader.upload(img, { folder: "clothes_products" })
+    );
+    const uploadResults = await Promise.all(uploadPromises);
+    const imageUrls = uploadResults.map((res) => res.secure_url);
 
     const product = await Product.create({
       name,
       description,
       type,
       sizes,
+      colors,
       basePrice,
-      imageUrl: result.secure_url,
+      images: imageUrls,
     });
 
     res.status(201).json(product);
@@ -32,7 +37,6 @@ const createProduct = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
 const getAllProducts = async (req, res) => {
   try {
     const products = await Product.find();
@@ -64,7 +68,7 @@ const updateProduct = async (req, res) => {
     }
     res.status(200).json(product);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: error });
   }
 };
 
@@ -76,7 +80,7 @@ const deleteProduct = async (req, res) => {
     }
     res.status(200).json(product);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: error });
   }
 };
 
@@ -87,19 +91,3 @@ module.exports = {
   updateProduct,
   deleteProduct,
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -1,12 +1,11 @@
 /** @type {import('tailwindcss').Config} */
-import tailwindcss from '@tailwindcss/vite'
 export default {
-  content: [],
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}", // adjust according to your project
+  ],
   theme: {
     extend: {},
   },
-  plugins: [
-    tailwindcss,
-  ],
+  plugins: [],
 }
-

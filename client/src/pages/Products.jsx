@@ -1,26 +1,90 @@
 import React, { useState } from "react";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const Products = () => {
-    const [formdata , setFormdata] = useState({
-        name:"",
-        description:"",
-        type:"",
-        sizes:[],
-        colors:[],
-        basePrice:"",
-        images:[],
-    })
-  const handlesubmit = () => {};
+  const [formdata, setFormdata] = useState({
+    name: "",
+    description: "",
+    type: "",
+    sizes: [],
+    colors: [],
+    basePrice: "",
+    images: [],
+  });
+  const [allProducts, setAllProducts] = useState([]);
+
+  const getAllProducts = async () => {
+    try {
+      const res = await axios.get("http://localhost:3000/api/products");
+      setAllProducts(res.data);
+      toast.success("Fetched all products");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to fetch products");
+    }
+  };
+  const [res, setRes] = useState(null);
+
   const handleInputChange = (e) => {
-    setFormdata({...formdata,[e.target.name]:e.target.value})
+    const { name, value } = e.target;
+    setFormdata((prev) => ({ ...prev, [name]: value }));
   };
-  const handleCheckboxChange = () => {
-    
+
+  const handleCheckboxChange = (e, field) => {
+    const { value, checked } = e.target;
+    setFormdata((prev) => ({
+      ...prev,
+      [field]: checked
+        ? [...prev[field], value]
+        : prev[field].filter((item) => item !== value),
+    }));
   };
+
+  const handleFileChange = async (e) => {
+    const files = Array.from(e.target.files);
+
+    const toBase64 = (file) =>
+      new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+      });
+
+    const base64Images = await Promise.all(files.map((file) => toBase64(file)));
+
+    setFormdata((prev) => ({ ...prev, images: base64Images }));
+  };
+
+  const handlesubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      console.log("Submitting:", formdata.images);
+      const res = await axios.post(
+        "http://localhost:3000/api/products",
+        formdata,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      toast.success("Product created successfully");
+      setRes(res.data);
+      console.log(res.data);
+    } catch (err) {
+      console.error(err);
+      toast.error(err.response?.data?.error || "Upload failed");
+    }
+  };
+
   return (
-    <div>
+
+    <>
       <form style={{ maxWidth: 600, margin: "auto" }} onSubmit={handlesubmit}>
-        <h1> Create Products</h1>
+        <h1>Create Product</h1>
         <input
           type="text"
           name="name"
@@ -31,22 +95,22 @@ const Products = () => {
         />
         <br />
         <textarea
-          onChange={handleInputChange}
-          placeholder="Description"
           name="description"
-          id="des"
+          placeholder="Description"
+          onChange={handleInputChange}
           value={formdata.description}
-        ></textarea>
+        />
         <br />
-        <select value={formdata.type} name="type" onChange={handleInputChange} id="x">
-          <option>T-Shirt</option>
-          <option>Hoodie</option>
-          <option>Sweatshirt</option>
-          <option>Cap</option>
-          <option>Other</option> <br />
+        <select name="type" onChange={handleInputChange} value={formdata.type}>
+          <option value="">Select type</option>
+          <option value="T-Shirt">T-Shirt</option>
+          <option value="Hoodie">Hoodie</option>
+          <option value="Sweatshirt">Sweatshirt</option>
+          <option value="Cap">Cap</option>
+          <option value="Other">Other</option>
         </select>
         <br />
-        <label htmlFor="sizes">Sizes:</label> <br />
+        <label>Sizes:</label> <br />
         {["S", "M", "L", "XL", "XXL"].map((size) => (
           <label key={size}>
             <input
@@ -57,11 +121,11 @@ const Products = () => {
             {size}
           </label>
         ))}
+        <br />
         <label>Colors:</label> <br />
         {["Black", "White", "Red", "Blue", "Grey"].map((color) => (
           <label key={color}>
-            <input 
-              name="colors"
+            <input
               type="checkbox"
               value={color}
               onChange={(e) => handleCheckboxChange(e, "colors")}
@@ -79,10 +143,40 @@ const Products = () => {
           value={formdata.basePrice}
         />
         <br />
-        <input type="file" multiple accept="image/*" onChange={handleInputChange} /> <br />
+        <input
+          type="file"
+          multiple
+          accept="image/*"
+          onChange={handleFileChange}
+        />
+        <br />
         <button type="submit">Create Product</button>
       </form>
-    </div>
+      <div>
+        {res?.images?.map((imgUrl, idx) => (
+          <img key={idx} src={imgUrl} alt={`Uploaded-${idx}`} width="150" />
+        ))}
+      </div>
+      <button onClick={getAllProducts}>Get All Products</button>
+      <div style={{ marginTop: 30 }}>
+        {allProducts.map((product, i) => (
+          <div key={i}>
+            <h3>{product.name}</h3>
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+              {product.images.map((url, idx) => (
+                <img
+                  key={idx}
+                  src={url}
+                  alt={`product-${i}-${idx}`}
+                  width="120"
+                />
+              ))}
+            </div>
+            <hr />
+          </div>
+        ))}
+      </div>
+    </>
   );
 };
 

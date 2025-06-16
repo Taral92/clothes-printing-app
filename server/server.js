@@ -8,6 +8,7 @@ const uploadRoutes = require("./routes/uploadRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const cookieParser = require("cookie-parser");
+const cartRoutes = require("./routes/cartRoutes");
 connectDB();
 const cors = require("cors");
 
@@ -26,6 +27,8 @@ app.use("/api/products", productRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/mockup", uploadRoutes);
+app.use("/api/cart", cartRoutes);
 
 app.use(errorHandler);
 

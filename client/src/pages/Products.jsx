@@ -1,8 +1,25 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import {jwtDecode} from "jwt-decode";
 
 const Products = () => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/");
+    }
+  }, [navigate]);
+  try {
+    const decodedToken = jwtDecode(localStorage.getItem("token"));
+    console.log(decodedToken);
+  } catch (error) {
+    console.log(error);
+    navigate("/");
+  }
   const [formdata, setFormdata] = useState({
     name: "",
     description: "",
@@ -81,7 +98,6 @@ const Products = () => {
   };
 
   return (
-
     <>
       <form style={{ maxWidth: 600, margin: "auto" }} onSubmit={handlesubmit}>
         <h1>Create Product</h1>

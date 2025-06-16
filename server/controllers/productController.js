@@ -15,7 +15,6 @@ const createProduct = async (req, res) => {
       return res.status(400).json({ error: "At least one image is required." });
     }
 
-    // Upload base64 images to Cloudinary
     const uploadPromises = images.map((base64) =>
       cloudinary.uploader.upload(base64, {
         folder: "clothes_products",
@@ -29,8 +28,8 @@ const createProduct = async (req, res) => {
       name,
       description,
       type,
-      sizes,  // Already an array from frontend
-      colors, // Already an array from frontend
+      sizes,  
+      colors, 
       basePrice,
       images: imageUrls,
     });

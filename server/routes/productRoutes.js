@@ -9,6 +9,7 @@ const {
   deleteProduct,
 } = require("../controllers/productController");
 
+
 router.post("/", createProduct);
 router.get("/", getAllProducts);
 router.get("/:id", getProductById);

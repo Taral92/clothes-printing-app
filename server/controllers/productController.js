@@ -1,6 +1,6 @@
 const Product = require("../models/Product");
 const cloudinary = require("cloudinary");
-
+const mongoose = require("mongoose");
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -9,31 +9,35 @@ cloudinary.config({
 
 const createProduct = async (req, res) => {
   try {
-    const { name, description, type, sizes, colors, basePrice, images } =
-      req.body;
+    const { name, description, type, sizes, colors, basePrice, images } = req.body;
 
     if (!images || !Array.isArray(images) || images.length === 0) {
       return res.status(400).json({ error: "At least one image is required." });
     }
 
-    const uploadPromises = images.map((img) =>
-      cloudinary.uploader.upload(img, { folder: "clothes_products" })
+    // Upload base64 images to Cloudinary
+    const uploadPromises = images.map((base64) =>
+      cloudinary.uploader.upload(base64, {
+        folder: "clothes_products",
+      })
     );
-    const uploadResults = await Promise.all(uploadPromises);
-    const imageUrls = uploadResults.map((res) => res.secure_url);
 
+    const uploadResults = await Promise.all(uploadPromises);
+    const imageUrls = uploadResults.map((result) => result.secure_url);
+    
     const product = await Product.create({
       name,
       description,
       type,
-      sizes,
-      colors,
+      sizes,  // Already an array from frontend
+      colors, // Already an array from frontend
       basePrice,
       images: imageUrls,
     });
 
     res.status(201).json(product);
   } catch (error) {
+    console.error("Upload error:", error);
     res.status(500).json({ error: error.message });
   }
 };

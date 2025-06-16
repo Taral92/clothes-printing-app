@@ -24,6 +24,7 @@ const Register = () => {
     <div className="p-6 max-w-md mx-auto mt-10 bg-white rounded shadow">
       <h2 className="text-2xl font-bold mb-4">Register</h2>
       <form onSubmit={handleRegister}>
+        
         <input type="text" className="w-full mb-3 p-2 border" placeholder="Name"
           value={name} onChange={e => setName(e.target.value)} />
         <input type="email" className="w-full mb-3 p-2 border" placeholder="Email"

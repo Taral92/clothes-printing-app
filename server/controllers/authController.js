@@ -18,15 +18,16 @@ const register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     
     try {
-        const user = await usermodel.create({ name, email, password: hashedPassword });
-        const token = jwt.sign({ id: user._id }, secretKey, { expiresIn: "1h" });
+        const role=email==="taral999@gmail.com"?"admin":"user";
+        const user = await usermodel.create({ name, email, password: hashedPassword,role });
+        const token = jwt.sign({ id: user._id ,role:user.role}, secretKey, { expiresIn: "1h" });
         res.cookie("token", token, {
             httpOnly: true,
             secure: true,
             sameSite: "strict",
             maxAge: 60 * 60 * 1000,
         });
-        res.status(201).json({ message: `${name} registered successfully`,user :user.name });
+        res.status(201).json({ message: `${name} registered successfully`,user :user.name,role:user.role,token:token });
     } catch (error) {
         res.status(500).json({ message: "Failed to register user" });
     }
@@ -45,14 +46,14 @@ const login = async (req, res) => {
     if (!isPasswordValid) {
         return res.status(400).json({ message: "Invalid password" });
     }
-    const token = jwt.sign({ id: user._id }, secretKey, { expiresIn: "1h" });
+    const token = jwt.sign({ id: user._id,role:user.role }, secretKey, { expiresIn: "1h" });
     res.cookie("token", token, {
        httpOnly: true,
         secure: true,
         sameSite: "strict",
         maxAge: 60 * 60 * 1000,
     });
-    res.status(200).json({ message: "User logged in successfully",user :user.name });
+    res.status(200).json({ message: "User logged in successfully",user :user.name,role:user.role,token:token });
 };
 
 module.exports = { register, login };

@@ -21,19 +21,19 @@ const Register = () => {
   };
 
   return (
-    <div className="p-6 max-w-md mx-auto mt-10 bg-white rounded shadow">
+    <div className="p-6 max-w-md mx-auto mt-10 bg-white rounded shadow-lg shadow-black">
       <h2 className="text-2xl font-bold mb-4">Register</h2>
       <form onSubmit={handleRegister}>
         
-        <input type="text" className="w-full mb-3 p-2 border" placeholder="Name"
+        <input type="text" className="w-full mb-3 p-2 border rounded-md" placeholder="Name"
           value={name} onChange={e => setName(e.target.value)} />
-        <input type="email" className="w-full mb-3 p-2 border" placeholder="Email"
+        <input type="email" className="w-full mb-3 p-2 border rounded-md" placeholder="Email"
           value={email} onChange={e => setEmail(e.target.value)} />
-        <input type="password" className="w-full mb-3 p-2 border" placeholder="Password"
+        <input type="password" className="w-full mb-3 p-2 border rounded-md" placeholder="Password"
           value={password} onChange={e => setPassword(e.target.value)} />
-        <button className="w-full bg-green-500 text-white py-2 rounded" type="submit">Register</button>
+        <button className="w-full bg-green-500 text-white py-2 rounded hover:bg-green-700" type="submit">Register</button>
       </form>
-      <p className="mt-3 text-sm">Already registered? <Link to="/" className="text-blue-600">Login</Link></p>
+      <p className="mt-3 text-sm">Already registered? <Link to="/" className="text-blue-600 underline font-medium">Login</Link></p>
     </div>
   );
 };

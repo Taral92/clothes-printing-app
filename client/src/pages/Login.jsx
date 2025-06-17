@@ -14,8 +14,9 @@ const Login = () => {
     e.preventDefault();
     try {
       const res = await axios.post('http://localhost:3000/api/auth/login', { email, password });
+      console.log(res.data);
       setToken(res.data.token);
-    
+    console.log(res.data.user);
       toast.success(`${res.data.user} logged in successfully`);
       navigate('/home');
     } catch (err) {

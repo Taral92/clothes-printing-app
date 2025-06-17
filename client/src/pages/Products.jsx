@@ -2,24 +2,11 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
 const Products = () => {
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      navigate("/");
-    }
-  }, [navigate]);
-  try {
-    const decodedToken = jwtDecode(localStorage.getItem("token"));
-    console.log(decodedToken);
-  } catch (error) {
-    console.log(error);
-    navigate("/");
-  }
+  const [loading, setLoading] = useState(true);
   const [formdata, setFormdata] = useState({
     name: "",
     description: "",
@@ -30,18 +17,31 @@ const Products = () => {
     images: [],
   });
   const [allProducts, setAllProducts] = useState([]);
-
-  const getAllProducts = async () => {
-    try {
-      const res = await axios.get("http://localhost:3000/api/products");
-      setAllProducts(res.data);
-      toast.success("Fetched all products");
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to fetch products");
-    }
-  };
   const [res, setRes] = useState(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+     console.log("No token found");
+      navigate("/");
+      return;
+    }
+
+    try {
+      const decodedToken = jwtDecode(token);
+      console.log("Decoded Token:", decodedToken);
+
+      if (decodedToken.role !== "admin") {
+        navigate("/");
+        return;
+      }
+
+      setLoading(false); // Ready to render the form
+    } catch (error) {
+      console.log("Invalid token:", error);
+      navigate("/");
+    }
+  }, [navigate]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -78,24 +78,37 @@ const Products = () => {
     e.preventDefault();
 
     try {
-      console.log("Submitting:", formdata.images);
       const res = await axios.post(
         "http://localhost:3000/api/products",
         formdata,
         {
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         }
       );
+
       toast.success("Product created successfully");
       setRes(res.data);
-      console.log(res.data);
     } catch (err) {
       console.error(err);
       toast.error(err.response?.data?.error || "Upload failed");
     }
   };
+
+  const getAllProducts = async () => {
+    try {
+      const res = await axios.get("http://localhost:3000/api/products");
+      setAllProducts(res.data);
+      toast.success("Fetched all products");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to fetch products");
+    }
+  };
+
+  if (loading) return <h1>Loading...</h1>;
 
   return (
     <>
@@ -168,12 +181,15 @@ const Products = () => {
         <br />
         <button type="submit">Create Product</button>
       </form>
+
       <div>
         {res?.images?.map((imgUrl, idx) => (
           <img key={idx} src={imgUrl} alt={`Uploaded-${idx}`} width="150" />
         ))}
       </div>
+
       <button onClick={getAllProducts}>Get All Products</button>
+
       <div style={{ marginTop: 30 }}>
         {allProducts.map((product, i) => (
           <div key={i}>

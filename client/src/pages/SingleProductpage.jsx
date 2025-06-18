@@ -18,11 +18,14 @@ const SingleProduct = () => {
         const token = localStorage.getItem("token");
         if (!token) return navigate("/login");
 
-        const res = await axios.get(`http://localhost:3000/api/products/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const res = await axios.get(
+          `http://localhost:3000/api/products/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         setProduct(res.data);
       } catch (error) {
         console.error("Error fetching product:", error);
@@ -43,7 +46,10 @@ const SingleProduct = () => {
   return (
     <div className="p-8 flex flex-col md:flex-row gap-10">
       <img
-        src={product.images?.[0] || "https://via.placeholder.com/400x300?text=No+Image"}
+        src={
+          product.images?.[0] ||
+          "https://via.placeholder.com/400x300?text=No+Image"
+        }
         alt={product.name}
         className="w-full md:w-1/2 h-96 object-cover object-center rounded-xl border shadow-md"
       />
@@ -71,12 +77,33 @@ const SingleProduct = () => {
           </div>
         </div>
 
-        <button
-          onClick={handleAddToCart}
-          className="bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition"
-        >
-          Add to Cart
-        </button>
+        <div className="flex gap-4">
+          <button
+            onClick={handleAddToCart}
+            className="bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition"
+          >
+            Add to Cart
+          </button>
+
+          <button
+            onClick={async () => {
+              try {
+                const res = await axios.post(
+                  "http://localhost:3000/api/payment/create-checkout-session",
+                  {
+                    cartItems: [{ ...product, quantity }],
+                  }
+                );
+                window.location.href = res.data.url;
+              } catch (err) {
+                console.error("Checkout error", err);
+              }
+            }}
+            className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition"
+          >
+            Checkout Now
+          </button>
+        </div>
       </div>
     </div>
   );

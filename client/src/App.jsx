@@ -12,12 +12,16 @@ import ProductList from "./pages/ProductList";
 import { Provider } from "react-redux";
 import store from "./redux/store";
 import SingleProductpage from "./pages/SingleProductpage";
+import Cart from "./pages/Cart";
+import Success from "./pages/Success";
+import Cancel from "./pages/Cancel.jsx";
 
 const App = () => (
   <Provider store={store}>
     <BrowserRouter>
     <Navbar />
     <Routes>
+      <Route path="/" element={<Landing />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/home" element={<Landing />} />
@@ -25,6 +29,9 @@ const App = () => (
       <Route path="/mockups" element={<Mockups />} />
       <Route path="/productlist" element={<ProductList />} />
       <Route path="/product/:id" element={<SingleProductpage />} />
+      <Route path="/cart" element={<Cart />} />
+      <Route path="/success" element={<Success />} />
+      <Route path="/cancel" element={<Cancel />} />
     </Routes>
     <ToastContainer />
   </BrowserRouter>

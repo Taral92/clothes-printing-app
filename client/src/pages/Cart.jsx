@@ -7,8 +7,12 @@ import { loadStripe } from "@stripe/stripe-js";
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
 const Cart = () => {
-  const cart = useSelector((state) => state.cart.items);
+    
+  const cart = useSelector((state) => state.z.cartItems);
+  console.log(cart);
 
+
+  
   const totalAmount = cart.reduce(
     (total, item) => total + item.basePrice * item.quantity,
     0

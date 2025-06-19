@@ -17,7 +17,6 @@ const SingleProduct = () => {
       try {
         const token = localStorage.getItem("token");
         if (!token) return navigate("/login");
-
         const res = await axios.get(
           `http://localhost:3000/api/products/${id}`,
           {

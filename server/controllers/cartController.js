@@ -1,32 +1,42 @@
-const Cart = require("../models/cartModel");
+const Cart = require("../models/CartModel");
+const jwt = require("jsonwebtoken");
 
-const createCart = async (req, res) => {
-  try {
-    const { user, products } = req.body;
-    const cart = await Cart.create({ user, products });
-    res.status(201).json(cart);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+const getUserIdFromToken = (req) => {
+  const token = req.headers.authorization?.split(" ")[1];
+  if (!token) throw new Error("No token provided");
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  return decoded.id;
 };
+
 
 const getCart = async (req, res) => {
   try {
-    const cart = await Cart.findOne({ user: req.params.userId });
-    res.status(200).json(cart);
+    const userId = getUserIdFromToken(req);
+    const cart = await Cart.findOne({ user: userId }).populate("products.productId");
+
+    res.status(200).json(cart?.products || []);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-const updateCart = async (req, res) => {
+const saveCart = async (req, res) => {
   try {
+    const userId = getUserIdFromToken(req);
+    const { cartItems } = req.body;
+
+    const formattedProducts = cartItems.map((item) => ({
+      productId: item.id,
+      quantity: item.quantity,
+    }));
+
     const cart = await Cart.findOneAndUpdate(
-      { user: req.params.userId },
-      req.body,
-      { new: true }
+      { user: userId },
+      { products: formattedProducts },
+      { new: true, upsert: true }
     );
-    res.status(200).json(cart);
+
+    res.status(200).json({ message: "Cart saved successfully", cart });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -34,16 +44,16 @@ const updateCart = async (req, res) => {
 
 const deleteCart = async (req, res) => {
   try {
-    const cart = await Cart.findOneAndDelete({ user: req.params.userId });
-    res.status(200).json(cart);
+    const userId = getUserIdFromToken(req);
+    await Cart.findOneAndDelete({ user: userId });
+    res.status(200).json({ message: "Cart deleted" });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
 module.exports = {
-  createCart,
   getCart,
-  updateCart,
+  saveCart,
   deleteCart,
 };

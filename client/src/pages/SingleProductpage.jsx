@@ -54,12 +54,11 @@ const SingleProduct = () => {
 
   const handleAddToCart = () => {
     if (!product) return;
-
     dispatch(
       addToCart({
         id: product._id,
         name: product.name,
-        price: product.basePrice || product.price,
+        price: product.basePrice,
         image: product.images?.[0],
         quantity,
       })
@@ -76,7 +75,7 @@ const SingleProduct = () => {
             {
               id: product._id,
               name: product.name,
-              price: product.basePrice || product.price,
+              price: (product.basePrice || product.price) * 100, // Convert $ to paise
               image: product.images?.[0],
               quantity,
             },
@@ -88,54 +87,66 @@ const SingleProduct = () => {
       );
       if (res.data.url) {
         window.location.href = res.data.url;
+      } else {
+        console.error("Stripe session URL not found.");
       }
     } catch (error) {
-      console.error("Checkout error:", error.message);
+      console.error("Checkout error:", error.response?.data || error.message);
     }
   };
-
   if (!product) {
-    return <p className="p-8 text-gray-500">Loading...</p>;
+    return <p className="p-8 text-gray-500 animate-pulse">Loading...</p>;
   }
 
   return (
-    <div className="p-8 flex flex-col md:flex-row gap-10">
+    <div className="max-w-7xl mx-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-10 items-start">
       <img
         src={
           product.images?.[0] ||
           "https://via.placeholder.com/400x300?text=No+Image"
         }
         alt={product.name}
-        className="w-full md:w-1/2 h-96 object-cover rounded-xl border shadow-md"
+        className="w-full h-[26rem] object-cover rounded-2xl border shadow-lg transition-transform duration-300 hover:scale-105"
       />
-      <div className="flex-1">
-        <h1 className="text-3xl font-bold">{product.name}</h1>
-        <p className="text-xl text-gray-700 mt-2">₹{product.price}</p>
-        <p className="text-gray-600 mt-2">{product.description}</p>
 
-        <div className="flex items-center gap-4 mt-6">
-          <label className="text-gray-700 font-medium">Quantity:</label>
-          <div className="flex items-center border rounded-lg">
-            <button onClick={handleDecrement} className="px-3 py-1">
-              -
+      <div className="space-y-5">
+        <h1 className="text-4xl font-bold text-gray-800">{product.name}</h1>
+        <p className="text-2xl text-green-600 font-semibold">
+          ${product.basePrice || product.price}
+        </p>
+        <p className="text-gray-600 leading-relaxed">{product.description}</p>
+
+        <div className="mt-6">
+          <label className="block text-gray-700 font-medium mb-2">
+            Quantity:
+          </label>
+          <div className="flex items-center border rounded-lg w-fit overflow-hidden">
+            <button
+              onClick={handleDecrement}
+              className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-lg"
+            >
+              −
             </button>
-            <span className="px-4">{quantity}</span>
-            <button onClick={handleIncrement} className="px-3 py-1">
+            <span className="px-6 py-2 text-lg font-medium">{quantity}</span>
+            <button
+              onClick={handleIncrement}
+              className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-lg"
+            >
               +
             </button>
           </div>
         </div>
 
-        <div className="flex gap-4 mt-6">
+        <div className="flex flex-wrap gap-4 mt-6">
           <button
             onClick={handleAddToCart}
-            className="bg-black text-white px-6 py-2 rounded-lg hover:bg-gray-800"
+            className="bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition duration-200"
           >
             Add to Cart
           </button>
           <button
             onClick={checkout}
-            className="bg-black text-white px-6 py-2 rounded-lg hover:bg-gray-800"
+            className="bg-black text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-900 transition duration-200"
           >
             Checkout
           </button>

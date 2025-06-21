@@ -4,22 +4,23 @@ import {
   removeFromCart,
   incrementQuantity,
   decrementQuantity,
-} from "../redux/slice"; 
+} from "../redux/slice";
 import { useNavigate } from "react-router-dom";
 import { isAuthenticated } from "../utils/auth";
 
 const Cart = () => {
+  const navigate = useNavigate();
+  const cart = useSelector((state) => state.z.cartItems);
+  const dispatch = useDispatch();
+
   useEffect(() => {
     if (!isAuthenticated()) {
       navigate("/login");
     }
-  }, []);
-  const navigate = useNavigate();
-  const cart = useSelector((state) => state.z.cartItems); 
-  const dispatch = useDispatch();
+  }, [navigate]);
 
   const totalAmount = cart.reduce(
-    (total, item) => total + item.basePrice * item.quantity,
+    (total, item) => total + item.price * item.quantity,
     0
   );
 
@@ -51,14 +52,14 @@ const Cart = () => {
               >
                 <img
                   src={
-                    item.images?.[0] ??
+                    item.image ??
                     "https://via.placeholder.com/300x200?text=No+Image"
                   }
                   alt={item.name}
                   className="w-full h-64 object-cover rounded-xl mb-4 border"
                 />
                 <h3 className="text-xl font-semibold">{item.name}</h3>
-                <p className="text-gray-700 mt-1">Price: ₹{item.price}</p>
+                <p className="text-gray-700 mt-1">Price: ${item.price}</p>
                 <div className="flex items-center gap-4 mt-2">
                   <button
                     onClick={() => handleDecrement(item.id)}
@@ -75,7 +76,7 @@ const Cart = () => {
                   </button>
                 </div>
                 <p className="text-gray-900 mt-2 font-medium">
-                  Subtotal: ₹{item.basePrice * item.quantity}
+                  Subtotal: ${item.price * item.quantity}
                 </p>
                 <button
                   onClick={() => handleRemove(item.id)}
@@ -88,7 +89,7 @@ const Cart = () => {
           </div>
 
           <div className="mt-8 text-right text-2xl font-bold">
-            Total: ₹{totalAmount}
+            Total: ${totalAmount}
           </div>
           <button
             onClick={() => navigate("/checkout")}
@@ -103,7 +104,3 @@ const Cart = () => {
 };
 
 export default Cart;
-
-
-
-

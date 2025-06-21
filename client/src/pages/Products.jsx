@@ -21,24 +21,13 @@ const Products = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (!token) {
-      console.log("No token found");
-      navigate("/");
-      return;
-    }
+    if (!token) return navigate("/");
 
     try {
-      const decodedToken = jwtDecode(token);
-      console.log("Decoded Token:", decodedToken);
-
-      if (decodedToken.role !== "admin") {
-        navigate("/");
-        return;
-      }
-
+      const decoded = jwtDecode(token);
+      if (decoded.role !== "admin") return navigate("/");
       setLoading(false);
-    } catch (error) {
-      console.log("Invalid token:", error);
+    } catch (err) {
       navigate("/");
     }
   }, [navigate]);
@@ -61,14 +50,13 @@ const Products = () => {
   const handleFileChange = async (e) => {
     const files = Array.from(e.target.files);
     const toBase64 = (file) =>
-      new Promise((resolve, reject) => {
+      new Promise((res, rej) => {
         const reader = new FileReader();
         reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = reject;
+        reader.onload = () => res(reader.result);
+        reader.onerror = rej;
       });
-
-    const base64Images = await Promise.all(files.map((file) => toBase64(file)));
+    const base64Images = await Promise.all(files.map(toBase64));
     setFormdata((prev) => ({ ...prev, images: base64Images }));
   };
 
@@ -76,29 +64,21 @@ const Products = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
-      if (!token) {
-        navigate("/");
-        return;
-      }
-      const decodedToken = jwtDecode(token);
-      if (decodedToken.role !== "admin") {
-        navigate("/");
-        return;
-      }
+      const decoded = jwtDecode(token);
+      if (decoded.role !== "admin") return navigate("/");
       const res = await axios.post(
         "http://localhost:3000/api/products",
         formdata,
         {
           headers: {
-            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
         }
       );
       toast.success("Product created successfully");
       setRes(res.data);
     } catch (err) {
-      console.error(err);
       toast.error(err.response?.data?.error || "Upload failed");
     }
   };
@@ -109,47 +89,49 @@ const Products = () => {
       setAllProducts(res.data);
       toast.success("Fetched all products");
     } catch (err) {
-      console.error(err);
       toast.error("Failed to fetch products");
     }
   };
 
   if (loading)
-    return <h1 className="text-center text-xl font-semibold">Loading...</h1>;
+    return (
+      <div className="text-center text-xl font-semibold mt-20">Loading...</div>
+    );
 
   return (
-    <div className="max-w-3xl mx-auto p-6">
+    <div className="max-w-5xl mx-auto px-6 py-10">
       <form
         onSubmit={handlesubmit}
-        className="space-y-4 bg-white p-6 shadow-md rounded-xl"
+        className="bg-white p-8 shadow-xl rounded-2xl space-y-6"
       >
-        <h1 className="text-2xl font-bold mb-4">Create Product</h1>
+        <h2 className="text-2xl font-bold text-gray-800">Add New Product</h2>
 
         <input
           type="text"
           name="name"
-          placeholder="Name"
-          onChange={handleInputChange}
-          value={formdata.name}
+          placeholder="Product Name"
           required
-          className="w-full border rounded px-3 py-2"
+          value={formdata.name}
+          onChange={handleInputChange}
+          className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
 
         <textarea
           name="description"
           placeholder="Description"
-          onChange={handleInputChange}
+          rows={4}
           value={formdata.description}
-          className="w-full border rounded px-3 py-2"
+          onChange={handleInputChange}
+          className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
 
         <select
           name="type"
-          onChange={handleInputChange}
           value={formdata.type}
-          className="w-full border rounded px-3 py-2"
+          onChange={handleInputChange}
+          className="w-full border border-gray-300 rounded-lg px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
-          <option value="">Select type</option>
+          <option value="">Select Product Type</option>
           <option value="T-Shirt">T-Shirt</option>
           <option value="Hoodie">Hoodie</option>
           <option value="Sweatshirt">Sweatshirt</option>
@@ -158,32 +140,34 @@ const Products = () => {
         </select>
 
         <div>
-          <label className="font-medium">Sizes:</label>
-          <div className="flex gap-3 flex-wrap mt-1">
+          <label className="block font-medium text-gray-700 mb-1">Sizes</label>
+          <div className="flex flex-wrap gap-4">
             {["S", "M", "L", "XL", "XXL"].map((size) => (
-              <label key={size} className="flex items-center gap-1">
+              <label key={size} className="flex items-center gap-2">
                 <input
                   type="checkbox"
                   value={size}
                   onChange={(e) => handleCheckboxChange(e, "sizes")}
+                  className="accent-blue-600"
                 />
-                {size}
+                <span className="text-gray-600">{size}</span>
               </label>
             ))}
           </div>
         </div>
 
         <div>
-          <label className="font-medium">Colors:</label>
-          <div className="flex gap-3 flex-wrap mt-1">
+          <label className="block font-medium text-gray-700 mb-1">Colors</label>
+          <div className="flex flex-wrap gap-4">
             {["Black", "White", "Red", "Blue", "Grey"].map((color) => (
-              <label key={color} className="flex items-center gap-1">
+              <label key={color} className="flex items-center gap-2">
                 <input
                   type="checkbox"
                   value={color}
                   onChange={(e) => handleCheckboxChange(e, "colors")}
+                  className="accent-blue-600"
                 />
-                {color}
+                <span className="text-gray-600">{color}</span>
               </label>
             ))}
           </div>
@@ -192,73 +176,78 @@ const Products = () => {
         <input
           type="number"
           name="basePrice"
-          placeholder="Price"
-          onChange={handleInputChange}
+          placeholder="Base Price"
           required
           value={formdata.basePrice}
-          className="w-full border rounded px-3 py-2"
+          onChange={handleInputChange}
+          className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
 
-      
-     <label className="block">
-     <span className="text-gray-700">Upload Images</span>
-     <input
-       type="file"
-       multiple
-       accept="image/*"
-       onChange={handleFileChange}
-       className="mt-1 block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none"
-     />
-   </label>
+        <div>
+          <label className="block font-medium text-gray-700 mb-1">
+            Upload Images
+          </label>
+          <input
+            type="file"
+            multiple
+            accept="image/*"
+            onChange={handleFileChange}
+            className="block w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-700 bg-gray-50 focus:outline-none"
+          />
+        </div>
 
         <button
           type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition"
         >
           Create Product
         </button>
       </form>
 
       {res?.images?.length > 0 && (
-        <div className="mt-6">
-          <h2 className="text-lg font-medium mb-2">Uploaded Images</h2>
-          <div className="flex gap-4 flex-wrap">
-            {res.images.map((imgUrl, idx) => (
+        <div className="mt-10">
+          <h3 className="text-xl font-semibold mb-3">Uploaded Images</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {res.images.map((img, i) => (
               <img
-                key={idx}
-                src={imgUrl}
-                alt={`Uploaded-${idx}`}
-                className="w-36 h-36 object-cover rounded border"
+                key={i}
+                src={img}
+                alt={`uploaded-${i}`}
+                className="rounded-lg border shadow-md object-cover h-36 w-full"
               />
             ))}
           </div>
         </div>
       )}
 
-      <button
-        onClick={getAllProducts}
-        className="mt-8 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
-      >
-        Get All Products
-      </button>
-
-      <div className="mt-8 space-y-8">
-        {allProducts.map((product, i) => (
-          <div key={i} className="border p-4 rounded-md shadow-sm">
-            <h3 className="text-xl font-semibold mb-2">{product.name}</h3>
-            <div className="flex gap-4 flex-wrap">
-              {product.images.map((url, idx) => (
-                <img
-                  key={idx}
-                  src={url}
-                  alt={`product-${i}-${idx}`}
-                  className="w-32 h-32 object-cover rounded border"
-                />
-              ))}
-            </div>
-          </div>
-        ))}
+      <div className="mt-12 text-center">
+        <button
+          onClick={getAllProducts}
+          className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium shadow-sm transition"
+        >
+          Load All Products
+        </button>
       </div>
+
+      {allProducts.length > 0 && (
+        <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6">
+          {allProducts.map((prod, idx) => (
+            <div key={idx} className="bg-white rounded-xl shadow-md p-4">
+              <h4 className="text-lg font-semibold mb-2">{prod.name}</h4>
+              <div className="flex flex-wrap gap-3">
+                {prod.images.map((img, i) => (
+                  <img
+                    key={i}
+                    src={img}
+                    alt={`product-${idx}-${i}`}
+                    className="w-24 h-24 object-cover rounded border"
+                  />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

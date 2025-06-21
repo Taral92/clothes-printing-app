@@ -15,6 +15,7 @@ import SingleProductpage from "./pages/SingleProductpage";
 import Cart from "./pages/Cart";
 import Success from "./pages/Success";
 import Cancel from "./pages/Cancel.jsx";
+import Footer from "./pages/Footer";
 
 const App = () => (
   <Provider store={store}>
@@ -32,6 +33,7 @@ const App = () => (
       <Route path="/cart" element={<Cart />} />
       <Route path="/success" element={<Success />} />
       <Route path="/cancel" element={<Cancel />} />
+      <Route path="/footer" element={<Footer />} />
     </Routes>
     <ToastContainer />
   </BrowserRouter>

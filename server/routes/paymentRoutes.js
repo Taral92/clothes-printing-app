@@ -14,11 +14,11 @@ router.post("/create-checkout-session", async (req, res) => {
       payment_method_types: ["card"],
       line_items: cartItems.map((item) => ({
         price_data: {
-          currency: "inr",
+          currency: "usd",
           product_data: {
             name: item.name || "Unnamed Product",
           },
-          unit_amount: Number(item.basePrice) * 100 || 1000,
+          unit_amount: Number(item.price || item.basePrice),
         },
         quantity: item.quantity || 1,
       })),

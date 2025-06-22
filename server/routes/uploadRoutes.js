@@ -1,9 +1,9 @@
 const express = require("express");
-const router = express.Router();
-const { uploadFromUrl, uploadMockupFromUrl } = require("../controllers/uploadController");
+const { uploadMockupFromBlob } = require("../controllers/uploadController");
 
-router.post("/", uploadFromUrl);
-router.post("/mockup", uploadMockupFromUrl);
+const router = express.Router();
+
+router.post("/", uploadMockupFromBlob);
 
 module.exports = router;
 

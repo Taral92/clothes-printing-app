@@ -16,6 +16,7 @@ import Cart from "./pages/Cart";
 import Success from "./pages/Success";
 import Cancel from "./pages/Cancel.jsx";
 import Footer from "./pages/Footer";
+import TshirtMockup from "./pages/TshirtMockup";
 
 const App = () => (
   <Provider store={store}>
@@ -34,6 +35,7 @@ const App = () => (
       <Route path="/success" element={<Success />} />
       <Route path="/cancel" element={<Cancel />} />
       <Route path="/footer" element={<Footer />} />
+      <Route path="/tshirtmockup" element={<TshirtMockup />} />
     </Routes>
     <ToastContainer />
   </BrowserRouter>

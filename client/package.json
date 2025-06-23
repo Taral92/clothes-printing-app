@@ -16,21 +16,16 @@
     "axios": "^1.10.0",
     "framer-motion": "^12.18.1",
     "jwt-decode": "^4.0.0",
-<<<<<<< HEAD
     "konva": "^9.3.20",
     "multer": "^2.0.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-konva": "^19.0.6",
-=======
-    "multer": "^2.0.1",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
->>>>>>> eb8c0a693aff2af7e36308b2bb68a3c33129a9fb
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.6.2",
     "react-toastify": "^11.0.5",
-    "redux-persist": "^6.0.0"
+    "redux-persist": "^6.0.0",
+    "use-image": "^1.1.4"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",

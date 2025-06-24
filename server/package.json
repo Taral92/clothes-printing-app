@@ -1,0 +1,30 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "nodemon server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "busboy": "^0.3.1",
+    "cloudinary": "^2.6.1",
+    "cookie-parser": "^1.4.7",
+    "express": "^5.1.0",
+    "jwt-decode": "^4.0.0",
+    "nodemon": "^3.1.10",
+    "react-router-dom": "^7.6.2",
+    "react-toastify": "^11.0.5",
+    "streamifier": "^0.1.1",
+    "stripe": "^18.2.1"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.5",
+    "tailwindcss": "^4.1.10"
+  }
+}

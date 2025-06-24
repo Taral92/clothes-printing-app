@@ -4,40 +4,90 @@ import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 const Register = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
+  const [form, setForm] = useState({ name: '', email: '', password: '' });
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
   const handleRegister = async (e) => {
     e.preventDefault();
+
+    const { name, email, password } = form;
+    if (!name || !email || !password) {
+      toast.warn("Please fill in all fields");
+      return;
+    }
+    
+
+    setLoading(true);
     try {
-      await axios.post('http://localhost:3000/api/auth/register', { name, email, password });
-      toast.success("Registered! You can now login.");
+      await axios.post('http://localhost:3000/api/auth/register', form);
+      toast.success("🎉 Registered successfully!");
       navigate('/');
     } catch (err) {
       toast.error(err.response?.data?.message || "Registration failed");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="p-6 max-w-md mx-auto mt-10 bg-white rounded shadow-lg shadow-black">
-      <h2 className="text-2xl font-bold mb-4">Register</h2>
-      <form onSubmit={handleRegister}>
-        
-        <input type="text" className="w-full mb-3 p-2 border rounded-md" placeholder="Name"
-          value={name} onChange={e => setName(e.target.value)} />
-        <input type="email" className="w-full mb-3 p-2 border rounded-md" placeholder="Email"
-          value={email} onChange={e => setEmail(e.target.value)} />
-        <input type="password" className="w-full mb-3 p-2 border rounded-md" placeholder="Password"
-          value={password} onChange={e => setPassword(e.target.value)} />
-        <button className="w-full bg-green-500 text-white py-2 rounded hover:bg-green-700" type="submit">Register</button>
-      </form>
-      <p className="mt-3 text-sm">Already registered? <Link to="/" className="text-blue-600 underline font-medium">Login</Link></p>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-300 p-4">
+      <div className="bg-white rounded-2xl shadow-md w-full max-w-sm px-6 py-8">
+        <h2 className="text-3xl font-bold text-center text-indigo-700 mb-6">📝 Register</h2>
+
+        <form onSubmit={handleRegister} className="space-y-4">
+          <input
+            type="text"
+            name="name"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+            placeholder="Full Name"
+            value={form.name}
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="email"
+            name="email"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+            placeholder="Email"
+            value={form.email}
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="password"
+            name="password"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+            placeholder="Password"
+            value={form.password}
+            onChange={handleChange}
+            required
+          />
+
+          <button
+            type="submit"
+            disabled={loading}
+            className={`w-full bg-indigo-600 text-white py-2 rounded-lg transition hover:bg-indigo-700 ${
+              loading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+          >
+            {loading ? "Creating account..." : "Register"}
+          </button>
+        </form>
+
+        <p className="mt-4 text-center text-sm text-gray-600">
+          Already have an account?{" "}
+          <Link to="/" className="text-indigo-600 hover:underline font-medium">
+            Login here
+          </Link>
+        </p>
+      </div>
     </div>
   );
 };
 
 export default Register;
-
-

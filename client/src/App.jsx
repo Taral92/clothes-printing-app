@@ -4,7 +4,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Landing from "./pages/Landing";
 import Products from "./pages/Products";
-import Mockups from "./pages/Mockups";
+
 import Navbar from "./pages/Navbar";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -17,28 +17,30 @@ import Success from "./pages/Success";
 import Cancel from "./pages/Cancel.jsx";
 import Footer from "./pages/Footer";
 import TshirtMockup from "./pages/TshirtMockup";
+import EditProduct from "./pages/EditProduct";
 
 const App = () => (
   <Provider store={store}>
     <BrowserRouter>
-    <Navbar />
-    <Routes>
-      <Route path="/" element={<Landing />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/home" element={<Landing />} />
-      <Route path="/products" element={<Products />} />
-      <Route path="/mockups" element={<Mockups />} />
-      <Route path="/productlist" element={<ProductList />} />
-      <Route path="/product/:id" element={<SingleProductpage />} />
-      <Route path="/cart" element={<Cart />} />
-      <Route path="/success" element={<Success />} />
-      <Route path="/cancel" element={<Cancel />} />
-      <Route path="/footer" element={<Footer />} />
-      <Route path="/tshirtmockup" element={<TshirtMockup />} />
-    </Routes>
-    <ToastContainer />
-  </BrowserRouter>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Landing />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/home" element={<Landing />} />
+        <Route path="/products" element={<Products />} />
+
+        <Route path="/productlist" element={<ProductList />} />
+        <Route path="/product/:id" element={<SingleProductpage />} />
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/success" element={<Success />} />
+        <Route path="/cancel" element={<Cancel />} />
+        <Route path="/footer" element={<Footer />} />
+        <Route path="/tshirtmockup" element={<TshirtMockup />} />
+        <Route path="/update-product/:id" element={<EditProduct />} />
+      </Routes>
+      <ToastContainer />
+    </BrowserRouter>
   </Provider>
 );
 

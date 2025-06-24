@@ -7,11 +7,43 @@ import {
 } from "../redux/slice";
 import { useNavigate } from "react-router-dom";
 import { isAuthenticated } from "../utils/auth";
+import axios from "axios";
 
 const Cart = () => {
   const navigate = useNavigate();
   const cart = useSelector((state) => state.z.cartItems);
   const dispatch = useDispatch();
+  const checkout = async () => {
+    try {
+      const token = localStorage.getItem("token");
+  
+      const cartItems = cart.map((item) => ({
+        id: item.id,
+        name: item.name,
+        price: item.basePrice * 100, 
+        image: item.images?.[0],
+        quantity: item.quantity,
+      }));
+  
+      const res = await axios.post(
+        "http://localhost:3000/api/payment/create-checkout-session",
+        { cartItems },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+  
+      if (res.data.url) {
+        window.location.href = res.data.url;
+      } else {
+        console.error("Stripe session URL not found.");
+      }
+    } catch (error) {
+      console.error("Checkout error:", error.response?.data || error.message);
+    }
+  };
 
   useEffect(() => {
     if (!isAuthenticated()) {
@@ -20,7 +52,7 @@ const Cart = () => {
   }, [navigate]);
 
   const totalAmount = cart.reduce(
-    (total, item) => total + item.price * item.quantity,
+    (total, item) => total + item.basePrice * item.quantity,
     0
   );
 
@@ -52,14 +84,14 @@ const Cart = () => {
               >
                 <img
                   src={
-                    item.image ??
+                    item.images?.[0] ||
                     "https://via.placeholder.com/300x200?text=No+Image"
                   }
                   alt={item.name}
                   className="w-full h-64 object-cover rounded-xl mb-4 border"
                 />
                 <h3 className="text-xl font-semibold">{item.name}</h3>
-                <p className="text-gray-700 mt-1">Price: ${item.price}</p>
+                <p className="text-gray-700 mt-1">Price: ${item.basePrice}</p>
                 <div className="flex items-center gap-4 mt-2">
                   <button
                     onClick={() => handleDecrement(item.id)}
@@ -76,7 +108,7 @@ const Cart = () => {
                   </button>
                 </div>
                 <p className="text-gray-900 mt-2 font-medium">
-                  Subtotal: ${item.price * item.quantity}
+                  Subtotal: ${item.basePrice * item.quantity}
                 </p>
                 <button
                   onClick={() => handleRemove(item.id)}
@@ -92,7 +124,7 @@ const Cart = () => {
             Total: ${totalAmount}
           </div>
           <button
-            onClick={() => navigate("/checkout")}
+            onClick={checkout}
             className="mt-4 bg-black text-white px-4 py-2 rounded hover:bg-gray-800"
           >
             Checkout
@@ -104,3 +136,7 @@ const Cart = () => {
 };
 
 export default Cart;
+
+
+
+

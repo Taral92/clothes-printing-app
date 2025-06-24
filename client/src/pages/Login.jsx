@@ -26,9 +26,11 @@ const Login = () => {
       dispatch(
         setCart(
           res.data.cart.map((item) => ({
-            ...item.productId,
-            id: item.productId._id,
+            ...item.product,
+            id: item.product._id,
             quantity: item.quantity,
+            basePrice: item.product.basePrice,
+            image: item.product.images?.[0],
           }))
         )
       );

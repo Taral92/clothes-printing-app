@@ -30,11 +30,21 @@ const Landing = () => {
               >
                 Upload Your Design
               </button>
+
               <button
                 onClick={() => navigate("/productlist")}
                 className="border border-gray-300 hover:border-gray-400 text-gray-700 text-lg px-6 py-3 rounded-xl transition"
               >
                 Explore Products
+              </button>
+            </div>
+
+            <div className="mt-6">
+              <button
+                onClick={() => navigate("/tshirtmockup")}
+                className="w-full sm:w-auto bg-white text-blue-600 border border-blue-600 hover:bg-blue-600 hover:text-white text-lg font-semibold px-6 py-3 rounded-xl shadow transition duration-300"
+              >
+                View Mockups
               </button>
             </div>
           </motion.div>

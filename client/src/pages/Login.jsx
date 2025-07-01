@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
+import { useDispatch } from "react-redux";
 import { setToken } from "../utils/auth";
 import { setCart } from "../redux/slice";
-import { useDispatch } from "react-redux";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -12,8 +12,33 @@ const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+  const isValidPassword = (password) =>
+    /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/.test(password);
+
   const handleLogin = async (e) => {
     e.preventDefault();
+
+    const isSpecialUser = email === "taral999@gmail.com";
+
+    if (!isValidEmail(email)) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+
+    if (!isSpecialUser && !isValidPassword(password)) {
+      toast.error(
+        "Password must be at least 6 characters and include both letters and numbers."
+      );
+      return;
+    }
+
+    if (isSpecialUser && password !== "taral") {
+      toast.error("Incorrect password for special user.");
+      return;
+    }
+
     try {
       const res = await axios.post("http://localhost:3000/api/auth/login", {
         email,
@@ -38,7 +63,6 @@ const Login = () => {
       toast.error(err.response?.data?.message || "Login failed");
     }
   };
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-300 p-4">
       <div className="w-full max-w-sm bg-white shadow-xl rounded-2xl p-8">
@@ -75,7 +99,10 @@ const Login = () => {
 
         <p className="mt-4 text-center text-sm text-gray-600">
           No account?{" "}
-          <Link to="/register" className="text-indigo-600 font-medium underline hover:text-indigo-800">
+          <Link
+            to="/register"
+            className="text-indigo-600 font-medium underline hover:text-indigo-800"
+          >
             Register
           </Link>
         </p>

@@ -15,7 +15,7 @@ const cors = require("cors");
 const app = express();
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://clothes-printing-frontend.vercel.app",
+  "https://clothes-printing-app.vercel.app",
 ];
 
 app.use(

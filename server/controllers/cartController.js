@@ -1,4 +1,4 @@
-const Cart = require("../models/CartModel");
+const Cart = require("../models/cartModel");
 const jwt = require("jsonwebtoken");
 
 const getUserIdFromToken = (req) => {

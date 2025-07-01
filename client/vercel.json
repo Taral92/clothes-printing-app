@@ -10,16 +10,11 @@
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "https://clothes-printing-backend.onrender.com/api/$1",
-      "headers": {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type, Authorization"
-      }
+      "dest": "https://clothes-printing-backend.onrender.com/api/$1"
     },
     {
       "src": "/(.*)",
-      "dest": "/dist/index.html"
+      "dest": "/index.html"
     }
   ]
 }

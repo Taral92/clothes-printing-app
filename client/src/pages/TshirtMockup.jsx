@@ -50,7 +50,7 @@ const TshirtMockup = () => {
     const blob = await (await fetch(uri)).blob();
 
     try {
-      const res = await axios.post("http://localhost:3000/api/upload", blob, {
+      const res = await axios.post("https://clothes-printing-backend.onrender.com/api/upload", blob, {
         headers: {
           "Content-Type": "image/png",
           Authorization: `Bearer ${localStorage.getItem("token")}`,

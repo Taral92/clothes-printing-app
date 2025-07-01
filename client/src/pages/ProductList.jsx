@@ -24,7 +24,7 @@ const ProductList = () => {
         const decoded = jwtDecode(token);
         setIsAdmin(decoded.role === "admin");
 
-        const res = await axios.get("http://localhost:3000/api/products", {
+        const res = await axios.get("https://clothes-printing-backend.onrender.com/api/products", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -52,7 +52,7 @@ const ProductList = () => {
   const handleDelete = async (id) => {
     const token = localStorage.getItem("token");
     try {
-      await axios.delete(`http://localhost:3000/api/products/${id}`, {
+      await axios.delete(`https://clothes-printing-backend.onrender.com/api/products/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setProducts((prev) => prev.filter((p) => p._id !== id));

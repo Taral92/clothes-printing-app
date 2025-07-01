@@ -22,7 +22,7 @@ const SingleProduct = () => {
         if (!token) return navigate("/login");
 
         const res = await axios.get(
-          `http://localhost:3000/api/products/${id}`,
+          `https://clothes-printing-backend.onrender.com/api/products/${id}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -69,7 +69,7 @@ const SingleProduct = () => {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.post(
-        "http://localhost:3000/api/payment/create-checkout-session",
+        "https://clothes-printing-backend.onrender.com/api/payment/create-checkout-session",
         {
           cartItems: [
             {

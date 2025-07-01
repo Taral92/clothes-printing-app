@@ -42,7 +42,7 @@ const Register = () => {
     setLoading(true);
 
     try {
-      await axios.post("http://localhost:3000/api/auth/register", form);
+      await axios.post("https://clothes-printing-backend.onrender.com/api/auth/register", form);
       toast.success("🎉 Registered successfully!");
       navigate("/");
     } catch (err) {

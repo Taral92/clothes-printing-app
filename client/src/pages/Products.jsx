@@ -67,7 +67,7 @@ const Products = () => {
       const decoded = jwtDecode(token);
       if (decoded.role !== "admin") return navigate("/");
       const res = await axios.post(
-        "http://localhost:3000/api/products",
+        "https://clothes-printing-backend.onrender.com/api/products",
         formdata,
         {
           headers: {
@@ -85,7 +85,7 @@ const Products = () => {
 
   const getAllProducts = async () => {
     try {
-      const res = await axios.get("http://localhost:3000/api/products");
+      const res = await axios.get("https://clothes-printing-backend.onrender.com/api/products");
       setAllProducts(res.data);
       toast.success("Fetched all products");
     } catch (err) {

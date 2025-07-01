@@ -25,7 +25,7 @@ const EditProduct = () => {
       if (decoded.role !== "admin") return navigate("/");
 
       axios
-        .get(`http://localhost:3000/api/products/${id}`, {
+        .get(`https://clothes-printing-backend.onrender.com/api/products/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((res) => {
@@ -68,7 +68,7 @@ const EditProduct = () => {
     const token = localStorage.getItem("token");
 
     try {
-      await axios.put(`http://localhost:3000/api/products/${id}`, formdata, {
+      await axios.put(`https://clothes-printing-backend.onrender.com/api/products/${id}`, formdata, {
         headers: { Authorization: `Bearer ${token}` },
       });
       toast.success("Product updated successfully");

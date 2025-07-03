@@ -2,38 +2,66 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import Footer from "./Footer";
+import { isAuthenticated, getToken } from "../utils/auth";
+import { toast } from "react-toastify";
+import { jwtDecode } from "jwt-decode";
 
 const Landing = () => {
   const navigate = useNavigate();
 
+  const handleUploadClick = () => {
+    if (!isAuthenticated()) {
+      toast.warn("⚠️ Please login to upload your design.");
+      navigate("/login");
+      return;
+    }
+
+    try {
+      const token = getToken();
+      const decoded = jwtDecode(token);
+
+      if (decoded?.role !== "admin") {
+        toast.error("❌ You are not an admin. Access denied.");
+        return;
+      }
+
+      navigate("/products");
+    } catch (err) {
+      toast.error("Something went wrong. Please login again.");
+      navigate("/login");
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#f9f9f9] to-[#e6f0ff] flex flex-col justify-between font-sans">
-      <div className="flex-grow flex items-center justify-center px-6 py-16">
+    <div className="min-h-screen bg-gradient-to-br from-[#0f172a] via-[#1e293b] to-[#334155] text-white flex flex-col font-sans">
+      <div className="flex-grow flex items-center justify-center px-6 py-20">
         <div className="max-w-7xl w-full flex flex-col-reverse md:flex-row items-center gap-16">
           <motion.div
-            initial={{ x: -50, opacity: 0 }}
+            initial={{ x: -80, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 1 }}
             className="flex-1"
           >
-            <h1 className="text-5xl md:text-6xl font-extrabold text-gray-900 leading-tight mb-4 tracking-tight">
-              Design <span className="text-blue-600">What You Wear</span>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight mb-6">
+              Design <span className="text-indigo-400">What You Wear</span>
             </h1>
-            <p className="text-lg text-gray-600 mb-6 max-w-lg leading-relaxed">
-              Upload your custom ideas. We print it. You wear it. Express your
-              style like never before.
+            <p className="text-lg text-gray-300 mb-8 max-w-xl leading-relaxed">
+              Upload your boldest ideas. We print it with precision. Make a
+              fashion statement that’s uniquely you. Premium designs, zero
+              compromise.
             </p>
+
             <div className="flex flex-wrap gap-4">
               <button
-                onClick={() => navigate("/products")}
-                className="bg-blue-600 hover:bg-blue-700 text-white text-lg font-semibold px-6 py-3 rounded-xl shadow-md transition duration-300"
+                onClick={handleUploadClick}
+                className="bg-indigo-600 hover:bg-indigo-700 text-white text-lg font-medium px-6 py-3 rounded-xl shadow-xl transition duration-300"
               >
                 Upload Your Design
               </button>
 
               <button
                 onClick={() => navigate("/productlist")}
-                className="border border-gray-300 hover:border-gray-400 text-gray-700 text-lg px-6 py-3 rounded-xl transition"
+                className="border border-gray-400 hover:border-gray-200 text-gray-200 hover:text-white text-lg px-6 py-3 rounded-xl transition duration-300"
               >
                 Explore Products
               </button>
@@ -42,7 +70,7 @@ const Landing = () => {
             <div className="mt-6">
               <button
                 onClick={() => navigate("/tshirtmockup")}
-                className="w-full sm:w-auto bg-white text-blue-600 border border-blue-600 hover:bg-blue-600 hover:text-white text-lg font-semibold px-6 py-3 rounded-xl shadow transition duration-300"
+                className="bg-white text-indigo-600 hover:bg-indigo-600 hover:text-white font-semibold text-lg px-6 py-3 rounded-xl shadow transition duration-300"
               >
                 View Mockups
               </button>
@@ -50,16 +78,18 @@ const Landing = () => {
           </motion.div>
 
           <motion.div
-            initial={{ x: 50, opacity: 0 }}
+            initial={{ x: 80, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            transition={{ duration: 0.8 }}
-            className="flex-1 flex justify-end"
+            transition={{ duration: 1 }}
+            className="flex-1 flex justify-center"
           >
-            <img
-              src="https://img.freepik.com/free-photo/young-stylish-sexy-woman-cinema-backstage_285396-7573.jpg?ga=GA1.1.1916049219.1750497840&semt=ais_hybrid&w=740"
-              alt="Design preview"
-              className="w-full max-w-md h-[800px] md:max-w-lg rounded-xl object-cover border border-gray-200 shadow-lg hover:scale-[1.02] transition duration-300 ease-in-out"
-            />
+            <div className="relative w-full max-w-md md:max-w-lg overflow-hidden rounded-2xl shadow-2xl border border-white/10">
+              <img
+                src="https://images.unsplash.com/photo-1527736947477-2790e28f3443?w=800&auto=format&fit=crop&q=80"
+                alt="Design preview"
+                className="w-full h-[500px] object-cover rounded-2xl transition-transform duration-500 ease-in-out hover:scale-105 shadow-lg"
+              />
+            </div>
           </motion.div>
         </div>
       </div>

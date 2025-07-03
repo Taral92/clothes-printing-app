@@ -14,63 +14,74 @@ const Navbar = () => {
   const handleLogout = () => {
     dispatch(clearCart());
     logout();
-    toast.success("Logged out successfully");
+    toast.success("👋 Logged out successfully");
     navigate("/");
   };
 
   return (
-    <nav className="bg-white/70 backdrop-blur-md border-b border-gray-200 shadow-md sticky top-0 z-50">
-  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div className="flex justify-between h-16 items-center">
-      <Link
-        to="/"
-        className="text-2xl font-bold text-gray-800 hover:text-indigo-600 tracking-tight transition"
-      >
-        👕 ClothesPrint
-      </Link>
+    <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200 shadow-sm">
+      <div className="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center">
+        
+        <Link
+          to="/"
+          className="text-3xl font-extrabold tracking-tight text-indigo-700 hover:text-indigo-900 transition"
+        >
+          👕 ClothesPrint
+        </Link>
 
-      <div className="flex items-center space-x-6">
-        {isAuthenticated() && (
-          <Link
-            to="/cart"
-            className="relative group text-gray-700 hover:text-indigo-600 transition"
-          >
-            🛒
-            {cartCount > 0 && (
-              <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full animate-ping">
-                {cartCount}
-              </span>
-            )}
-          </Link>
-        )}
+       
+        <div className="flex items-center gap-6">
+          {isAuthenticated() && (
+            <>
+              
+              <Link
+                to="/orders"
+                className="text-gray-700 hover:text-indigo-600 font-medium transition"
+              >
+                📋 Orders
+              </Link>
 
-        {isAuthenticated() ? (
-          <button
-            onClick={handleLogout}
-            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition shadow"
-          >
-            Logout
-          </button>
-        ) : (
-          <>
-            <Link
-              to="/login"
-              className="text-gray-700 hover:text-indigo-600 transition font-medium"
+              {/* Cart Icon */}
+              <Link to="/cart" className="relative group">
+                <span className="text-2xl hover:text-indigo-600 transition">
+                  🛒
+                </span>
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-2 w-5 h-5 bg-red-600 text-white text-xs rounded-full flex items-center justify-center font-bold shadow-lg animate-bounce">
+                    {cartCount}
+                  </span>
+                )}
+              </Link>
+            </>
+          )}
+
+          {/* Auth Buttons */}
+          {isAuthenticated() ? (
+            <button
+              onClick={handleLogout}
+              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow transition duration-200"
             >
-              Login
-            </Link>
-            <Link
-              to="/register"
-              className="text-gray-700 hover:text-indigo-600 transition font-medium"
-            >
-              Register
-            </Link>
-          </>
-        )}
+              Logout
+            </button>
+          ) : (
+            <>
+              <Link
+                to="/login"
+                className="text-gray-700 hover:text-indigo-600 font-medium transition"
+              >
+                Login
+              </Link>
+              <Link
+                to="/register"
+                className="bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm hover:bg-indigo-700 transition shadow"
+              >
+                Register
+              </Link>
+            </>
+          )}
+        </div>
       </div>
-    </div>
-  </div>
-</nav>
+    </nav>
   );
 };
 

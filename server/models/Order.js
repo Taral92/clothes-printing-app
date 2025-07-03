@@ -9,7 +9,7 @@ const orderSchema = new mongoose.Schema(
     },
     products: [
       {
-        productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
+        productId: { type: mongoose.Schema.Types.Mixed, ref: "Product" },
         quantity: { type: Number, default: 1 },
         size: String,
         color: String,
@@ -24,6 +24,7 @@ const orderSchema = new mongoose.Schema(
       enum: ["pending", "processing", "shipped", "delivered"],
       default: "pending",
     },
+    mockupImage: String, 
     shippingAddress: {
       address: String,
       city: String,

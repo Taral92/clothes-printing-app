@@ -14,6 +14,14 @@ const SingleProduct = () => {
 
   const [product, setProduct] = useState(null);
   const [quantity, setQuantity] = useState(existingItem?.quantity || 1);
+  const [address, setAddress] = useState({
+    address: "",
+    city: "",
+    postalCode: "",
+    country: "",
+  });
+  const [showOrderForm, setShowOrderForm] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -65,19 +73,47 @@ const SingleProduct = () => {
     );
   };
 
-  const checkout = async () => {
+  const handlePlaceOrder = async (e) => {
+    e.preventDefault();
+
     try {
+      setLoading(true);
       const token = localStorage.getItem("token");
-      const res = await axios.post(
+
+      // 1. Place order for this single product
+      const orderRes = await axios.post(
+        "https://clothes-printing-backend.onrender.com/api/orders",
+        {
+          products: [
+            {
+              productId: product._id,
+              quantity,
+              size: product.size || "",
+              color: product.color || "",
+            },
+          ],
+          total: product.basePrice * quantity,
+          shippingAddress: address,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      const orderId = orderRes.data._id;
+
+      // 2. Create Stripe checkout session
+      const sessionRes = await axios.post(
         "https://clothes-printing-backend.onrender.com/api/payment/create-checkout-session",
         {
+          orderId,
           cartItems: [
             {
               id: product._id,
               name: product.name,
-              price: (product.basePrice || product.price) * 100, // Convert $ to paise
-              image: product.images?.[0],
+              price: product.basePrice * 100,
               quantity,
+              image: product.images?.[0] || "",
             },
           ],
         },
@@ -85,15 +121,19 @@ const SingleProduct = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      if (res.data.url) {
-        window.location.href = res.data.url;
+
+      if (sessionRes.data.url) {
+        window.location.href = sessionRes.data.url;
       } else {
-        console.error("Stripe session URL not found.");
+        alert("Payment session not created");
       }
-    } catch (error) {
-      console.error("Checkout error:", error.response?.data || error.message);
+    } catch (err) {
+      console.error("Order error:", err);
+    } finally {
+      setLoading(false);
     }
   };
+
   if (!product) {
     return <p className="p-8 text-gray-500 animate-pulse">Loading...</p>;
   }
@@ -112,7 +152,7 @@ const SingleProduct = () => {
       <div className="space-y-5">
         <h1 className="text-4xl font-bold text-gray-800">{product.name}</h1>
         <p className="text-2xl text-green-600 font-semibold">
-          ${product.basePrice || product.price}
+          ₹{product.basePrice || product.price}
         </p>
         <p className="text-gray-600 leading-relaxed">{product.description}</p>
 
@@ -145,13 +185,59 @@ const SingleProduct = () => {
             Add to Cart
           </button>
           <button
-            onClick={checkout}
+            onClick={() => setShowOrderForm(true)}
             className="bg-black text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-900 transition duration-200"
           >
-            Checkout
+            Place Order
           </button>
         </div>
       </div>
+
+      {/* Order Form Modal */}
+      {showOrderForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-xl">
+            <h3 className="text-xl font-semibold mb-4">Shipping Address</h3>
+            <form onSubmit={handlePlaceOrder} className="space-y-4">
+              {Object.keys(address).map((field) => (
+                <input
+                  key={field}
+                  type="text"
+                  name={field}
+                  required
+                  placeholder={
+                    field.charAt(0).toUpperCase() + field.slice(1)
+                  }
+                  value={address[field]}
+                  onChange={(e) =>
+                    setAddress((prev) => ({
+                      ...prev,
+                      [field]: e.target.value,
+                    }))
+                  }
+                  className="w-full px-4 py-2 border rounded"
+                />
+              ))}
+              <div className="flex justify-end gap-4 mt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowOrderForm(false)}
+                  className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700"
+                >
+                  {loading ? "Placing..." : "Continue to Payment"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

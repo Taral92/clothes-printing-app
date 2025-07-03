@@ -18,6 +18,11 @@ import Cancel from "./pages/Cancel.jsx";
 import Footer from "./pages/Footer";
 import TshirtMockup from "./pages/TshirtMockup";
 import EditProduct from "./pages/EditProduct";
+import OrderReceipt from "./pages/OrderReceipt";
+
+import OrderForm from "./pages/OrderForm";
+
+import OrderStatus from "./pages/OrderStatus";
 
 const App = () => (
   <Provider store={store}>
@@ -34,10 +39,14 @@ const App = () => (
         <Route path="/product/:id" element={<SingleProductpage />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/success" element={<Success />} />
+       
         <Route path="/cancel" element={<Cancel />} />
         <Route path="/footer" element={<Footer />} />
         <Route path="/tshirtmockup" element={<TshirtMockup />} />
         <Route path="/update-product/:id" element={<EditProduct />} />
+        <Route path="/order/:orderId/receipt" element={<OrderReceipt />} />
+        <Route path="/order-form" element={<OrderForm />} />
+        <Route path="/orders" element={<OrderStatus />} />
       </Routes>
       <ToastContainer />
     </BrowserRouter>

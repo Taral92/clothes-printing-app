@@ -4,9 +4,14 @@ import useImage from "use-image";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { addToCart } from "../redux/slice";
+import { isAuthenticated, getToken } from "../utils/auth";
 
 const TshirtMockup = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const stageRef = useRef();
   const logoRef = useRef();
   const transformerRef = useRef();
@@ -22,8 +27,9 @@ const TshirtMockup = () => {
   const [logoImage] = useImage(logoURL);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) navigate("/");
+    if (!isAuthenticated()) {
+      navigate("/login");
+    }
   }, [navigate]);
 
   useEffect(() => {
@@ -41,27 +47,57 @@ const TshirtMockup = () => {
   };
 
   const exportMockup = async () => {
+    if (!stageRef.current || !logoRef.current) return;
+
     transformerRef.current.visible(false);
     transformerRef.current.getLayer().batchDraw();
+
     const uri = stageRef.current.toDataURL({ pixelRatio: 2 });
+
     transformerRef.current.visible(true);
     transformerRef.current.getLayer().batchDraw();
 
     const blob = await (await fetch(uri)).blob();
 
     try {
-      const res = await axios.post("https://clothes-printing-backend.onrender.com/api/upload", blob, {
-        headers: {
-          "Content-Type": "image/png",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+      const res = await axios.post(
+        "https://clothes-printing-backend.onrender.com/api/upload",
+        blob,
+        {
+          headers: {
+            "Content-Type": "image/png",
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
+      );
       setUploadedURL(res.data.url);
-      toast.success("✅ Uploaded!");
+      toast.success("✅ Mockup uploaded!");
     } catch (err) {
       toast.error("Upload failed.");
       console.error("❌ Upload error:", err);
     }
+  };
+
+  const handleAddToCart = () => {
+    if (!uploadedURL) {
+      toast.error("Please upload your mockup first");
+      return;
+    }
+
+    dispatch(
+      addToCart({
+        id: `custom-${Date.now()}`,
+        name: "Custom T-Shirt",
+        basePrice: 699, // set your own pricing logic here
+        quantity: 1,
+        images: [uploadedURL],
+        size: "",
+        color: "",
+      })
+    );
+
+    toast.success("✅ Added to cart!");
+    navigate("/cart");
   };
 
   return (
@@ -72,6 +108,7 @@ const TshirtMockup = () => {
         </h2>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+          {/* Canvas */}
           <div className="flex justify-center items-center border rounded-xl shadow-inner bg-gray-100 p-4">
             <Stage
               width={stageSize.width}
@@ -123,11 +160,11 @@ const TshirtMockup = () => {
                         "bottom-left",
                         "bottom-right",
                       ]}
-                      boundBoxFunc={(oldBox, newBox) => {
-                        return newBox.width < 40 || newBox.height < 40
+                      boundBoxFunc={(oldBox, newBox) =>
+                        newBox.width < 40 || newBox.height < 40
                           ? oldBox
-                          : newBox;
-                      }}
+                          : newBox
+                      }
                     />
                   </>
                 )}
@@ -135,6 +172,7 @@ const TshirtMockup = () => {
             </Stage>
           </div>
 
+          {/* Controls */}
           <div className="flex flex-col justify-start space-y-6">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -158,19 +196,28 @@ const TshirtMockup = () => {
             )}
 
             {uploadedURL && (
-              <div className="bg-blue-50 border border-blue-200 p-4 rounded-xl">
-                <p className="text-sm text-blue-700 font-medium mb-1">
-                  ✅ Uploaded Mockup URL:
-                </p>
-                <a
-                  href={uploadedURL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-indigo-600 hover:underline break-all"
+              <>
+                <div className="bg-blue-50 border border-blue-200 p-4 rounded-xl">
+                  <p className="text-sm text-blue-700 font-medium mb-1">
+                    ✅ Uploaded Mockup URL:
+                  </p>
+                  <a
+                    href={uploadedURL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-indigo-600 hover:underline break-all"
+                  >
+                    {uploadedURL}
+                  </a>
+                </div>
+
+                <button
+                  onClick={handleAddToCart}
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold px-6 py-2 rounded-lg shadow"
                 >
-                  {uploadedURL}
-                </a>
-              </div>
+                  🛒 Add to Cart
+                </button>
+              </>
             )}
           </div>
         </div>

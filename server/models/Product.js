@@ -24,7 +24,7 @@ const productSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  images: [String], // cloudinary links
+  images: [String], 
   stock: {
     type: Number,
     default: 100,

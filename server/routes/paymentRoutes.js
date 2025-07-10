@@ -27,8 +27,8 @@ router.post("/create-checkout-session", async (req, res) => {
         quantity: item.quantity || 1,
       })),
       mode: "payment",
-      success_url: `http://localhost:5173/success?orderId=${orderId}`,
-      cancel_url: "http://localhost:5173/cancel",
+      success_url: `https://clothes-printing-app.vercel.app/success?orderId=${orderId}`,
+      cancel_url: "https://clothes-printing-app.vercel.app/cancel",
     });
 
     res.status(200).json({ url: session.url });
